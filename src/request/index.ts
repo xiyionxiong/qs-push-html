@@ -7,7 +7,7 @@ class HttpClient {
   private service: AxiosInstance;
 
   private baseURL = import.meta.env.PROD
-    ? "https://wisecloud.wiseasy.com/wisecloud-gateway-open-platform"
+    ? "https://wisecloud-sg.wiseasy.com/wisecloud-gateway-open-platform"
     : "/proxy";
 
   constructor() {
@@ -20,17 +20,8 @@ class HttpClient {
     this.service.interceptors.request.use(
       async (config) => {
         NProgress.start();
-        // config.headers.Authorization = await localforage.getItem(
-        //   'Authorization'
-        // );
-        // config.headers.nonce = v4();
         config.headers.timestamp = new Date().getTime();
-
-        config.params = this.signatrue(
-          config.url,
-          JSON.stringify(config.params)
-        );
-
+        config.data = this.signatrue(config.data);
         return config;
       },
       (error) => {
@@ -92,8 +83,8 @@ class HttpClient {
     return CryptoJS.MD5(str).toString();
   };
 
-  appSecret = "Z8mNOaVG1PxFMl6J6vM2euS3F1qsE7P4l5HsqvcsvX9vciLtdV";
-  accessKeyId = "Z8mNOaVG1PxFMl6J6vM2euS3F1qsE7P4l5HsqvcsvX9vciLtdV";
+  appSecret = "CQdQBkJJTzxbUZFjtEznNWTfAJcANEVb";
+  accessKeyId = "6479baa5f17ac1000199d8f7";
   uuid() {
     var temp_url = URL.createObjectURL(new Blob());
     var uuid = temp_url.toString();
@@ -101,17 +92,11 @@ class HttpClient {
     return uuid.substring(uuid.lastIndexOf("/") + 1);
   }
 
-  signatrue(url?: string, params?: string) {
-    let options: Record<string, any> = {
-        appid: "lwzz",
-        nonce: this.uuid(),
-        timestamp: new Date().getTime(),
-      },
-      signaData = url,
-      authentications = ["Authorization", "appid", "nonce", "timestamp"];
+  signatrue(params?: Record<string, any>) {
+    let signaData = "";
 
-    authentications.map((key, index) => {
-      signaData = signaData + `${index !== 0 ? "&" : ""}${key}=${options[key]}`;
+    Object.keys(params!).forEach((key, index) => {
+      signaData = signaData + `${index !== 0 ? "&" : ""}${key}=${params![key]}`;
     });
 
     let signature = this.md5(signaData + this.appSecret);
@@ -119,9 +104,11 @@ class HttpClient {
     return {
       signType: "MD5",
       version: "1.0",
-      encryptionSwitch: "on",
+      timestamp: new Date().getTime(),
+      nonce: this.uuid(),
+      encryptionSwitch: "off",
       signatureValue: signature,
-      data: params,
+      data: JSON.stringify(params),
       accessKeyId: this.accessKeyId,
     };
   }
