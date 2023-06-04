@@ -20,8 +20,12 @@ class HttpClient {
     this.service.interceptors.request.use(
       async (config) => {
         NProgress.start();
-        // config.headers.timestamp = new Date().getTime();
+
+        //  timestamp: new Date().getTime(),
+        config.headers.nonce = this.uuid();
+        config.headers.timestamp = new Date().getTime();
         config.headers['Accept-Language'] = 'en-US';
+
         config.data = this.signatrue(config.data);
         return config;
       },
@@ -108,22 +112,8 @@ class HttpClient {
     keys.forEach((key, index) => {
       signaData = signaData + `${index !== 0 ? '&' : ''}${key}=${params![key]}`;
     });
-
-    console.log('signaData>>', signaData);
-
-    let signature = this.md5(signaData + this.appSecret);
-
-    // const signatureValue = btoa(
-    //   CryptoJS.AES.encrypt(
-    //     params ? JSON.stringify(params) : '',
-    //     this.appSecret
-    //   ).toString()
-    // );
-
-    // // let signature = this.md5('1');
-    // let signature = this.md5(signatureValue + this.appSecret);
-
-    // console.log('signatureValue>>', signatureValue);
+    // console.log('signaData>>', signaData);
+    const signature = this.md5(signaData + this.appSecret);
 
     return {
       version: '1.0',
@@ -133,7 +123,6 @@ class HttpClient {
       signType: 'MD5',
       signatureValue: signature,
       encryptionSwitch: 'off',
-      // data: signatureValue,
       data: JSON.stringify(params),
     };
   }

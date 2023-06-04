@@ -1,17 +1,18 @@
-import httpClient from ".";
+import httpClient from '.';
 
 export default function pushMessage(message: string) {
   const params = {
     broadcastNumber: 100,
-    commandKey: "voice",
+    commandKey: 'voice',
     content: message,
-    sn: "WQRJ002215000013",
+    sn: 'WQRJ002215000013',
     submitType: 1,
-    voiceType: "localTTS",
+    voiceType: 'localTTS',
   };
 
   httpClient.post(
-    "/wisecloud-gateway-open-platform/open/service/api/instruction/task/push",
+    '/wisecloud-gateway-open-platform/voice/service/api/delivery/pushMsg',
+    // "/wisecloud-gateway-open-platform/open/service/api/instruction/task/push",
     params
   );
 }
