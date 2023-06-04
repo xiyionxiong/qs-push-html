@@ -1,14 +1,14 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
-import CryptoJS from "crypto-js";
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
+import CryptoJS from 'crypto-js';
 
 class HttpClient {
   private service: AxiosInstance;
 
   private baseURL = import.meta.env.PROD
-    ? "https://wisecloud-sg.wiseasy.com/wisecloud-gateway-open-platform"
-    : "/proxy";
+    ? 'https://wisecloud-sg.wiseasy.com/wisecloud-gateway-open-platform'
+    : '/proxy';
 
   constructor() {
     this.service = axios.create({
@@ -20,7 +20,8 @@ class HttpClient {
     this.service.interceptors.request.use(
       async (config) => {
         NProgress.start();
-        config.headers.timestamp = new Date().getTime();
+        // config.headers.timestamp = new Date().getTime();
+        config.headers['Accept-Language'] = 'en-US';
         config.data = this.signatrue(config.data);
         return config;
       },
@@ -44,11 +45,11 @@ class HttpClient {
 
           return res;
         }
-        return Promise.reject(new Error(res.message || "Error"));
+        return Promise.reject(new Error(res.message || 'Error'));
       },
       (error) => {
         NProgress.done();
-        console.log("err" + error);
+        console.log('err' + error);
         return Promise.reject(error);
       }
     );
@@ -62,7 +63,7 @@ class HttpClient {
     return await this.service
       .post<T, Response<T>, D>(url, params, config)
       .catch((error) => {
-        console.log("error=>", error);
+        console.log('error=>', error);
         return { code: -1, data: null, message: error } as Response<T>;
       });
   }
@@ -74,7 +75,7 @@ class HttpClient {
     return await this.service
       .get<T, Response<T>, D>(url, config)
       .catch((error) => {
-        console.log("error=>", error);
+        console.log('error=>', error);
         return { code: -1, data: null, message: error } as Response<T>;
       });
   }
@@ -83,33 +84,57 @@ class HttpClient {
     return CryptoJS.MD5(str).toString();
   };
 
-  appSecret = "CQdQBkJJTzxbUZFjtEznNWTfAJcANEVb";
-  accessKeyId = "6479baa5f17ac1000199d8f7";
+  appSecret = 'CQdQBkJJTzxbUZFjtEznNWTfAJcANEVb';
+  accessKeyId = '6479baa5f17ac1000199d8f7';
   uuid() {
     var temp_url = URL.createObjectURL(new Blob());
     var uuid = temp_url.toString();
     URL.revokeObjectURL(temp_url);
-    return uuid.substring(uuid.lastIndexOf("/") + 1);
+    return uuid.substring(uuid.lastIndexOf('/') + 1);
   }
 
   signatrue(params?: Record<string, any>) {
-    let signaData = "";
+    let signaData = '';
 
-    Object.keys(params!).forEach((key, index) => {
-      signaData = signaData + `${index !== 0 ? "&" : ""}${key}=${params![key]}`;
+    const keys = [
+      'broadcastNumber',
+      'commandKey',
+      'content',
+      'sn',
+      'submitType',
+      'voiceType',
+    ];
+
+    keys.forEach((key, index) => {
+      signaData = signaData + `${index !== 0 ? '&' : ''}${key}=${params![key]}`;
     });
+
+    console.log('signaData>>', signaData);
 
     let signature = this.md5(signaData + this.appSecret);
 
+    // const signatureValue = btoa(
+    //   CryptoJS.AES.encrypt(
+    //     params ? JSON.stringify(params) : '',
+    //     this.appSecret
+    //   ).toString()
+    // );
+
+    // // let signature = this.md5('1');
+    // let signature = this.md5(signatureValue + this.appSecret);
+
+    // console.log('signatureValue>>', signatureValue);
+
     return {
-      signType: "MD5",
-      version: "1.0",
+      version: '1.0',
+      accessKeyId: this.accessKeyId,
       timestamp: new Date().getTime(),
       nonce: this.uuid(),
-      encryptionSwitch: "off",
+      signType: 'MD5',
       signatureValue: signature,
+      encryptionSwitch: 'off',
+      // data: signatureValue,
       data: JSON.stringify(params),
-      accessKeyId: this.accessKeyId,
     };
   }
 }
