@@ -3,15 +3,19 @@ import pushMessage from "./request/push";
 
 type BaseType = {
   key?: string;
-  pushMsg: (msg: string) => void;
+  amount: string;
+  pushMsg: () => void;
+  setAmount: (amount: string) => void;
 };
 
 const useContext = create<BaseType>((set, get) => ({
   key: "app",
-  pushMsg: (msg) => {
-
-    pushMessage(msg);
+  amount: "0.00",
+  pushMsg: () => {
+    const { amount } = get();
+    pushMessage(+amount);
   },
+  setAmount: (amount: string) => set({ amount }),
 }));
 
 export default useContext;

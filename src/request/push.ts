@@ -1,18 +1,34 @@
-import httpClient from '.';
+import httpClient from ".";
+import { parse } from "./voice";
 
-export default function pushMessage(message: string) {
+export default function pushMessage(amount: number) {
+  const infos = parse(amount);
+
   const params = {
-    broadcastNumber: 100,
-    commandKey: 'voice',
-    content: message,
-    sn: 'WQRJ002215000013',
+    broadcastNumber: amount,
+    commandKey: "voice",
+    content: `Wechat pay,$${amount} received`,
+    sn: "WQRJ002215000013",
     submitType: 1,
-    voiceType: 'localTTS',
+    voiceType: "localZipper",
+    voiceZipperInfo: [
+      ...infos,
+
+      {
+        code: "V00002_EN_U_DOLLARS",
+        voiceText: "$",
+        type: "code",
+      },
+      {
+        code: "V00002_EN_A_RECEIVE",
+        voiceText: "Recevied",
+        type: "code",
+      },
+    ],
   };
 
   httpClient.post(
-    '/wisecloud-gateway-open-platform/voice/service/api/delivery/pushMsg',
-    // "/wisecloud-gateway-open-platform/open/service/api/instruction/task/push",
+    "/wisecloud-gateway-open-platform/voice/service/api/delivery/pushMsg",
     params
   );
 }
