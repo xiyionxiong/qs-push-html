@@ -1,6 +1,7 @@
 import { NumericKeyboard } from "numeric-keyboard/dist/numeric_keyboard.react.js";
 import useContext from "./App";
 import "./App.css";
+import Keyboard from "./Keyboard";
 
 function App() {
   const { pushMsg, setAmount, amount } = useContext();
@@ -14,20 +15,20 @@ function App() {
           alt="Vite logo"
         />
 
-        <h2 style={{ width: "60%", margin: "0 auto" }}>
-          QS equipment live demonstration Demo
-        </h2>
+        <h2 style={{ width: "60%", margin: "0 auto" }}>Payment live demo</h2>
       </div>
 
       <div style={{ textAlign: "left" }}>
         <label style={{ marginLeft: 32 }}>Amount: (Maximum: 999999.99)</label>
         <div />
         <div id="number-pad" placeholder="请输入数字" className="input">
-          {amount}
+          $ {amount}
         </div>
       </div>
 
       <div>
+        {/* <Keyboard /> */}
+
         <NumericKeyboard
           entertext="Send"
           // layout='tel'
@@ -43,13 +44,14 @@ function App() {
               return;
             }
             if (key === "del") {
-              if (am === "") {
+              let r = `${am}`;
+              r = r.slice(0, r.length - 1);
+
+              if (am === "" || r === "") {
                 setAmount("0.00");
                 return;
               }
 
-              let r = `${am}`;
-              r = r.slice(0, r.length - 1);
               setAmount(r);
               return;
             }

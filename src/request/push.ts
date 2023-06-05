@@ -4,6 +4,10 @@ import { parse } from "./voice";
 export default function pushMessage(amount: number) {
   const infos = parse(amount);
 
+  const sn = getQueryString("sn");
+
+  console.log("sn", sn);
+
   const params = {
     broadcastNumber: amount,
     commandKey: "voice",
@@ -27,8 +31,22 @@ export default function pushMessage(amount: number) {
     ],
   };
 
-  httpClient.post(
-    "/wisecloud-gateway-open-platform/voice/service/api/delivery/pushMsg",
-    params
-  );
+  return httpClient
+    .post(
+      "/wisecloud-gateway-open-platform/voice/service/api/delivery/pushMsg",
+      params
+    )
+    .then((res) => {
+      if (res.code === 0) alert("Send succeed");
+      return res.code === 0;
+    });
+}
+
+function getQueryString(name: string) {
+  let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+  let r = window.location.search.substr(1).match(reg);
+  if (r != null) {
+    return decodeURIComponent(r[2]);
+  }
+  return null;
 }

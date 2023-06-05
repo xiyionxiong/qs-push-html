@@ -13,7 +13,8 @@ const useContext = create<BaseType>((set, get) => ({
   amount: "0.00",
   pushMsg: () => {
     const { amount } = get();
-    pushMessage(+amount);
+
+    pushMessage(+amount).then((succeed) => succeed && set({ amount: "0.00" }));
   },
   setAmount: (amount: string) => set({ amount }),
 }));
