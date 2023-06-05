@@ -12,7 +12,7 @@ export default function pushMessage(amount: number) {
     broadcastNumber: amount,
     commandKey: "voice",
     content: `Wechat pay,$${amount} received`,
-    sn: "WQRJ002215000013",
+    sn: sn ?? "WQRJ002215000013",
     submitType: 1,
     voiceType: "localZipper",
     voiceZipperInfo: [
@@ -37,7 +37,7 @@ export default function pushMessage(amount: number) {
       params
     )
     .then((res) => {
-      if (res.code === 0) alert("Send succeed");
+      // if (res.code === 0) alert("Send succeed");
       return res.code === 0;
     });
 }

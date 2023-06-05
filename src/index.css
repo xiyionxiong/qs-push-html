@@ -10,10 +10,23 @@
   -webkit-text-size-adjust: 100%;
   overflow: hidden;
   color: #213547;
-  background-color: #ffffff;
+
+  -moz-user-select: none; /*火狐*/
+  -webkit-user-select: none; /*webkit浏览器*/
+  -ms-user-select: none; /*IE10*/
+  -khtml-user-select: none; /*早期浏览器*/
+  user-select: none;
 }
 
 body {
   margin: 0;
   overflow: hidden;
+  background-color: #eaeaea;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+@font-face {
+  font-family: "wechat";
+  src: url("./assets/WeChat-Sans-SS-Medium.ttf");
 }
